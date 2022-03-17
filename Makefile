@@ -3,7 +3,7 @@
 CXX=clang++-9 
 CXXFLAGS=-std=c++2a -Werror -Wsign-conversion
 
-SOURCES=NumberWithUnits.cpp
+SOURCES=Matrix.cpp
 OBJECTS=$(subst .cpp,.o,$(SOURCES))
 
 run: demo
