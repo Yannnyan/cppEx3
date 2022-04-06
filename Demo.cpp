@@ -12,6 +12,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
 using namespace std;
 
 #include "Matrix.hpp"

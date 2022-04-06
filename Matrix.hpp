@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <stdbool.h>
+#include <vector>
 
 using namespace std;
 
@@ -11,43 +13,46 @@ namespace zich{
         private:
 
         public:
-            Matrix(vector<double> identity, int row, int column);
-
+            Matrix(const vector<double> & identity, int row, int column);
+            Matrix();
             // operators
             
             // addition
-            Matrix operator+(Matrix & mat2);
-            Matrix & operator++();
-            Matrix operator+=(double num);
+            friend Matrix operator+(const Matrix & mat2, const Matrix & mat1);
+            Matrix operator++( int );
+            friend Matrix & operator+=(Matrix & mat, double num);
 
 
             // subtraction
-            Matrix operator-(Matrix & mat2);
+            friend Matrix& operator-(Matrix & mat);
+            friend Matrix operator-(Matrix & mat2, Matrix & mat1);
             Matrix operator--();
-            Matrix operator-=(double num);
+            friend Matrix operator-=(Matrix & mat, double num);
 
             // multiplication
-            Matrix operator*(Matrix & mult);
-            Matrix operator*(double dub);
+            friend Matrix operator*(Matrix & mat, Matrix & mult);
+            friend Matrix operator*(Matrix & mat, double dub);
+            friend Matrix operator*(double dub, Matrix & mat);
+
+            friend Matrix operator*= (Matrix & mat, double dub);
+            friend Matrix operator*= (double dub, Matrix& mat);
             
             // comparisons
             
             // bigger than
-            bool operator>(Matrix & mat2);
-            bool operator>=(Matrix & mat2);
+            friend bool operator>(Matrix & mat1, Matrix & mat2);
+            friend bool operator>=(Matrix & mat1, Matrix & mat2);
 
             // lt
-            bool operator<(Matrix & mat2);
-            bool operator<=(Matrix & mat2);
+            friend bool operator<(Matrix & mat1, Matrix & mat2);
+            friend bool operator<=(Matrix & mat1, Matrix & mat2);
             
             // eq
-            bool operator==(Matrix & mat2);
-            bool operator!=(Matrix & mat2);
+            friend bool operator==(Matrix & mat1, Matrix & mat2);
+            friend bool operator!=(Matrix mat1, Matrix & mat2);
 
             // input output
-            void operator<<(Matrix & mat);
-            void operator>>(Matrix & toInput);
-    }
-
-
+            friend ostream & operator<<(ostream& os, const Matrix & mat);
+            friend istream & operator>>(istream& is, Matrix & inp);
+    };
 }

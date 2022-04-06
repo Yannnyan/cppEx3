@@ -17,21 +17,12 @@ using namespace zich;
 
 
  // defining identity vectors
-    vector<double> vec0();
+    vector<double> vec0 = {};
     vector<double> vec11 = {1};
     vector<double> vec22 = {1, 2, 3, 4};
     vector<double> vec23 = {1, 2, 3, 4, 5, 6};
     vector<double> vec32 = {1, 3, 5, 2, 4, 6};
     vector<double> vec33 = {1, 2, 3, 4, 5, 6};
-
-    // big vectors
-    long int bigNum1 = 250000;
-    long int bigNum2 = (long int)(bigNum1 * 4);
-    long int bigNum3 = (long int) (bigNum1 * 100);
-    vector<double> bigVec1, bigVec2, bigVec3;
-    bigVec1.assign(bigNum1, 1);
-    bigVec2.assign(bigNum2, 2);
-    bigVec3.assign(bigNum3, 3);
 
     // defining matrix
     Matrix mat0(vec0, 0, 0);
@@ -41,12 +32,38 @@ using namespace zich;
     Matrix mat32(vec32, 3, 2);
     Matrix mat33(vec33, 3, 3);
 
-    Matrix bigMat1(bigVec1, 500, 500);
-    Matrix bigMat2(bigVec2, 1000, 1000);
-    Matrix bigMat3(bigVec3, 5000, 5000);
+
+
+
+
+TEST_CASE("Good input - matrix addition")
+{
+    vector<double> iden1{4,4,4,4};
+}
+
 
 TEST_CASE("Good input")
 {
+    
+     // big vectors
+    size_t bigNum1 = 250000;
+    size_t bigNum2 = (size_t)(bigNum1 * 4);
+    size_t bigNum3 = (size_t) (bigNum1 * 100);
+    vector<double> bigVec1(bigNum1);
+    vector<double> bigVec2(bigNum2);
+    vector<double> bigVec3(bigNum3);
+    for(size_t i=0; i< bigNum1; i++){
+        bigVec1[i] = 1;
+    }
+    for(size_t i=0; i< bigNum2; i++){
+        bigVec2[i] = 2;
+    }
+    for(size_t i=0; i< bigNum3; i++){
+        bigVec3[i] = 3;
+    }
+    Matrix bigMat1(bigVec1, 500, 500);
+    Matrix bigMat2(bigVec2, 1000, 1000);
+    Matrix bigMat3(bigVec3, 5000, 5000);
     // check plus operator
    CHECK_NOTHROW(mat0 + mat0);
 
@@ -57,7 +74,7 @@ TEST_CASE("Good input")
    CHECK_NOTHROW(3 * bigMat3);
 
    // check matrix multiplication, must be that the left matrix column equal to the right matrix row
-   CHECK_NOTHROW(bigmat1 * bigmat1);
+   CHECK_NOTHROW(bigMat1 * bigMat1);
 
    CHECK_NOTHROW(mat23 * mat32);
    // check matrix output operator
@@ -65,8 +82,8 @@ TEST_CASE("Good input")
    CHECK_NOTHROW(cout << mat33);
    //check matrix input operator
 
-   Matrix mat;
-   CHECK_NOTHROW(mat22 >> mat);
+   Matrix mat(vec0, 0, 0);
+   //CHECK_NOTHROW(mat22 >> mat);
 
 }
 
@@ -78,6 +95,26 @@ TEST_CASE("Good input")
  */
 
 TEST_CASE("Bad Input- addition between matrixes"){
+    
+     // big vectors
+    size_t bigNum1 = 250000;
+    size_t bigNum2 = (size_t)(bigNum1 * 4);
+    size_t bigNum3 = (size_t) (bigNum1 * 100);
+    vector<double> bigVec1(bigNum1);
+    vector<double> bigVec2(bigNum2);
+    vector<double> bigVec3(bigNum3);
+    for(size_t i=0; i< bigNum1; i++){
+        bigVec1[i] = 1;
+    }
+    for(size_t i=0; i< bigNum2; i++){
+        bigVec2[i] = 2;
+    }
+    for(size_t i=0; i< bigNum3; i++){
+        bigVec3[i] = 3;
+    }
+    Matrix bigMat1(bigVec1, 500, 500);
+    Matrix bigMat2(bigVec2, 1000, 1000);
+    Matrix bigMat3(bigVec3, 5000, 5000);
     /* check throws plus operator */
     /* RULE 1 */
     // checking mat 0
@@ -147,6 +184,26 @@ TEST_CASE("Bad Input- addition between matrixes"){
 
 TEST_CASE("Bad input - matrix subtraction operator")
 {
+    
+     // big vectors
+    size_t bigNum1 = 250000;
+    size_t bigNum2 = (size_t)(bigNum1 * 4);
+    size_t bigNum3 = (size_t) (bigNum1 * 100);
+    vector<double> bigVec1(bigNum1);
+    vector<double> bigVec2(bigNum2);
+    vector<double> bigVec3(bigNum3);
+   for(size_t i=0; i< bigNum1; i++){
+        bigVec1[i] = 1;
+    }
+    for(size_t i=0; i< bigNum2; i++){
+        bigVec2[i] = 2;
+    }
+    for(size_t i=0; i< bigNum3; i++){
+        bigVec3[i] = 3;
+    }
+    Matrix bigMat1(bigVec1, 500, 500);
+    Matrix bigMat2(bigVec2, 1000, 1000);
+    Matrix bigMat3(bigVec3, 5000, 5000);
      /* check throws subtraction operator operator */
     /* RULE 1 */
     // checking mat 0
@@ -227,6 +284,26 @@ TEST_CASE("Bad Input - scalar multiplication operator")
 */
 TEST_CASE("Bad Input - matrix multiplication operator")
 {
+    
+     // big vectors
+    size_t bigNum1 = 250000;
+    size_t bigNum2 = (size_t)(bigNum1 * 4);
+    size_t bigNum3 = (size_t) (bigNum1 * 100);
+    vector<double> bigVec1(bigNum1);
+    vector<double> bigVec2(bigNum2);
+    vector<double> bigVec3(bigNum3);
+    for(size_t i=0; i< bigNum1; i++){
+        bigVec1[i] = 1;
+    }
+    for(size_t i=0; i< bigNum2; i++){
+        bigVec2[i] = 2;
+    }
+    for(size_t i=0; i< bigNum3; i++){
+        bigVec3[i] = 3;
+    }
+    Matrix bigMat1(bigVec1, 500, 500);
+    Matrix bigMat2(bigVec2, 1000, 1000);
+    Matrix bigMat3(bigVec3, 5000, 5000);
     /* check left mat's column and right mat's row not equal */
     
     // normal checks
