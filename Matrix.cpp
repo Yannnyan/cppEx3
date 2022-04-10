@@ -379,7 +379,7 @@ namespace zich{
     // outputs a string representation of mat to os
     ostream & operator<<(ostream& os, const Matrix & mat)
     {
-        os << ( this ->toString() );
+        os << ( mat.toString() );
         return os;
     }   
     // receives string matrix representation and parses it to a matrix
@@ -396,10 +396,117 @@ namespace zich{
         {
             throw(invalid_argument("brackets are not found"));
         }
+        bool double_space= false;
+        // check for double space
         for(int i=0; i< size; i++)
         {
-            if(str.at(i) == )
+            if(str.at(i) == ' ')
+            {
+                if(double_space)
+                {
+                    throw(invalid_argument("invalid double space found in the input."));
+                }
+                double_space = true;
+            }
+            else{
+                double_space = false;
+            }
         }
-        
+        // check for invalid characters
+        char c;
+        for(int i=1; i< size-1; i++)
+        {
+            c = str.at(i);
+            if( (c < 48 || c > 57) && (c != ' ') && (c != ',') && (c != '.'))
+            {
+                throw(invalid_argument("invalid character found in the input."));
+            }
+        }
+        // check for invalid space before the first char
+        if(str.at(1) == ' ' || str.at(size-2) == ' ')
+        {
+            throw(invalid_argument("space found before the first char or before the last char."));
+        }
+        bool was_comma = false;
+        // check for space after comma
+        for(int i=0; i< size-1; i++)
+        {
+            if(was_comma && str.at(i) != ' ')
+            {
+                throw(invalid_argument("space not found after comma."));
+            }
+            if(str.at(i) == ',')
+            {
+                was_comma = true;
+            }
+            else
+            {
+                was_comma = false;
+            }
+        }
+        // check for the same amount of numbers between each commas
+        int rowlen = 0;
+        int current_rowlen = 0;
+        was_comma = false;
+        for(int i=1; i< size-1; i++)
+        {
+            if(was_comma == false && str.at(i) == ' ') // identify the length of the first row and check out that is the length of the row
+            {
+                rowlen +=1;
+            }
+            if(was_comma == false && str.at(i) == ',') // if we received a comma then differ the first row from the other ones 
+            {
+                i++;
+                was_comma = true;
+            }
+            else if(was_comma) // if the first comma already appeared
+            {
+                if(str.at(i) == ' ') // if we got a space then another number appeared, we already checked there is no double space or more
+                {
+                    current_rowlen +=1 ;
+                }
+                if(str.at(i) == ',') // if we got another comma, then check if the length of the current comma is different from the first row
+                {
+                    i++;
+                    if(current_rowlen != rowlen) // if it's different then throw.
+                    {
+                        throw(invalid_argument("found a row that has different length from another other row"));
+                    }
+                    current_rowlen = 0; // else keep running.
+                }
+            }
+        }
+        if(rowlen != current_rowlen) // cover for the case in which the comma and space ends the row
+        {
+            throw(invalid_argument("found a row that has different length from another other row"));
+        }
+
+        // check for dot in wrong places or double dot
+        for(int i=1; i< size-1; i++)
+        {
+            if()
+        }
+
+        string number = "";
+        vector<double> vec;
+        char c;
+        // construct the vector
+        for(int i=1; i< size-1; i++)
+        {
+            c = str.at(i);
+            if(c == ',' || c == ' ') // new number is now contructed last number inserted to the vector
+            {
+                if(!number.empty())
+                    vec.push_back(stod(number));
+                number = "";
+                i++;
+            }
+            while(i < size-1 && c != ' ' && c != ',') // construct a number
+            { 
+                c = str.at(i);
+                number.push_back(c);
+                i++;
+            }
+        }
     }
 }
