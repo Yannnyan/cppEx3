@@ -7,49 +7,71 @@
 
 using namespace std;
 
+// auxilary functions
+double mult_row_by_col(zich::Matrix & leftMat, zich::Matrix & rightMat, int row, int column) const;
+double sum_matrix() const;
 
 namespace zich{
     class Matrix{
         private:
+            int _numRows;
+            int _numColumns;
+            vector<double> _identity;
+            
 
         public:
+            // getters and setters
+            int getNumRows() const {return this -> _numRows;}
+            int getNumCols() const {return this -> _numColumns;}
+            double getElement(int row, int column) const;
+            vector<double> getCopyIdentity() const;
+            string toString() const;
+            // Constructors
             Matrix(const vector<double> & identity, int row, int column);
+            Matrix(const Matrix &mat);
             Matrix();
+            // Destructors
+            // ~
             // operators
-            
             // addition
-            friend Matrix operator+(const Matrix & mat2, const Matrix & mat1);
+            Matrix operator+(const Matrix & mat1);
+            // postfix operator
             Matrix operator++( int );
-            friend Matrix & operator+=(Matrix & mat, double num);
+            // prefix operator 
+            Matrix & operator++();
+            Matrix & operator+=(double num);
 
 
             // subtraction
-            friend Matrix& operator-(Matrix & mat);
-            friend Matrix operator-(Matrix & mat2, Matrix & mat1);
-            Matrix operator--();
-            friend Matrix operator-=(Matrix & mat, double num);
+            Matrix operator-(const Matrix & mat);
+            // unary - prefix operator
+            Matrix operator-();
+            // postfix operator
+            Matrix operator--( int );
+            // prefix operator
+            Matrix & operator--();
+            Matrix & operator-=(double num);
 
             // multiplication
-            friend Matrix operator*(Matrix & mat, Matrix & mult);
-            friend Matrix operator*(Matrix & mat, double dub);
-            friend Matrix operator*(double dub, Matrix & mat);
+            Matrix operator*(const Matrix & mult);
+            Matrix operator*(double dub);
+            friend Matrix operator*(double dub, const Matrix & mat);
 
-            friend Matrix operator*= (Matrix & mat, double dub);
-            friend Matrix operator*= (double dub, Matrix& mat);
+            Matrix & operator*= (double dub);
             
             // comparisons
             
             // bigger than
-            friend bool operator>(Matrix & mat1, Matrix & mat2);
-            friend bool operator>=(Matrix & mat1, Matrix & mat2);
+            bool operator>(const Matrix & mat2);
+            bool operator>=(const Matrix & mat2);
 
             // lt
-            friend bool operator<(Matrix & mat1, Matrix & mat2);
-            friend bool operator<=(Matrix & mat1, Matrix & mat2);
+            bool operator<(const Matrix & mat2);
+            bool operator<=(const Matrix & mat2);
             
             // eq
-            friend bool operator==(Matrix & mat1, Matrix & mat2);
-            friend bool operator!=(Matrix mat1, Matrix & mat2);
+            bool operator==(const Matrix & mat2);
+            bool operator!=(const Matrix & mat2);
 
             // input output
             friend ostream & operator<<(ostream& os, const Matrix & mat);
