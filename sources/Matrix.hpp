@@ -33,7 +33,8 @@ namespace zich{
             // ~
             // operators
             // addition
-            Matrix operator+(Matrix & mat1);
+            Matrix operator+() const;
+            Matrix operator+(Matrix & mat1) const;
             // postfix operator
             Matrix operator++( int );
             // prefix operator 
@@ -138,5 +139,5 @@ namespace zich{
     }
 // auxilary functions
 double mult_row_by_col(const zich::Matrix & leftMat,const zich::Matrix & rightMat, int row, int column);
-double sum_matrix();
+double sum_matrix(zich::Matrix & mat);
 

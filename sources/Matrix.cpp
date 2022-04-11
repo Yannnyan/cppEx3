@@ -6,7 +6,8 @@
 #include <vector>
 #include "Matrix.hpp"
 
-
+constexpr int zero = 48;
+constexpr int nine = 57;
 using namespace std;
 
 // auxilary functions
@@ -24,11 +25,12 @@ double mult_row_by_col(const zich::Matrix & leftMat, const zich::Matrix & rightM
     {
         throw(invalid_argument("row is bigger or equal to the number of rows. mult_row_by_col"));
     }
-    else if(column >=  leftMat.getNumCols())
+    if(column >=  leftMat.getNumCols())
     {
         throw(invalid_argument("column is bigger or equal to the number of columns."));
     }
-    int i,j;
+    int i = 0;
+    int j = 0;
     double sum=0;
     int cols = leftMat.getNumCols();
     for(j=0; j< cols; j++)
@@ -37,9 +39,9 @@ double mult_row_by_col(const zich::Matrix & leftMat, const zich::Matrix & rightM
     }
     return sum;
 }
-double sum_matrix(zich:: Matrix mat)
+double sum_matrix(zich::Matrix &mat)
 {
-    int i,j;
+    int i=0; int j=0;
     int rows =  mat.getNumRows();
     int cols = mat.getNumCols();
     double sum= 0;
@@ -58,8 +60,8 @@ namespace zich{
     // returns a copy of the string
     string Matrix::toString() const
     {
-        string str = "";
-        int i,j;
+        string str;
+        int i=0; int j=0;
         for(i=0; i< this->_numRows; i++)
         {
             str.push_back('[');
@@ -78,18 +80,22 @@ namespace zich{
     }
     // operators
     // addition
-    Matrix Matrix::operator+(Matrix & mat1)
+    // returns a copy of the matrix
+    Matrix Matrix::operator+() const{
+        return Matrix(this->_identity, this->_numRows, this-> _numColumns);
+    }
+    Matrix Matrix::operator+(Matrix & mat1) const
     {
         if (mat1.getNumCols() != this-> _numColumns)
         {
             throw(invalid_argument("number of columns is not equal, operator+"));
         }
-        else if(mat1.getNumRows() != this-> _numRows)
+        if(mat1.getNumRows() != this-> _numRows)
         {
             throw(invalid_argument("number of rows in not equal, operator+"));
         }
         vector<double> vec;
-        int i,j;
+        int i=0; int j=0;
         for(i=0; i< this-> _numRows; i++)
         {
             for(j=0; j< this->_numColumns; j++)
@@ -109,8 +115,8 @@ namespace zich{
             throw(invalid_argument("matrix has row length 0 or column length 0"));
         }
         Matrix mat(*this); // before getting updated this is the return value
-        size_t i,j;
-        size_t row;
+        size_t i = 0; size_t j = 0;
+        size_t row = 0;
         size_t columns = (size_t)(this -> _numColumns);
         for(i=0; i< (this->_numRows); i++)
         {
@@ -132,8 +138,8 @@ namespace zich{
         {
             throw(invalid_argument("matrix has row length 0 or column length 0"));
         }
-        size_t i,j;
-        size_t row;
+        size_t i = 0; size_t j = 0;
+        size_t row = 0;
         size_t columns = (size_t)(this->_numColumns);
         for(i=0; i< this->_numRows; i++)
         {
@@ -153,8 +159,8 @@ namespace zich{
         {
             throw(invalid_argument("matrix has row length 0 or column length 0"));
         }
-        size_t i,j;
-        size_t row;
+        size_t i = 0; size_t j = 0;
+        size_t row = 0;
         size_t columns = (size_t)(this-> _numColumns);
         for(i=0; i< this->_numRows; i++)
         {
@@ -175,12 +181,12 @@ namespace zich{
         {
             throw(invalid_argument("number of columns is not equal, operator-"));
         }
-        else if(mat.getNumRows() != (this-> _numRows) )
+        if(mat.getNumRows() != (this-> _numRows) )
         {
             throw(invalid_argument("number of rows in not equal, operator-"));
         }
         vector<double> vec;
-        int i,j;
+        int i=0; int j=0;
         int rows = mat.getNumRows();
         int columns = mat.getNumCols();
         for(i=0; i< rows; i++) // iterate one by one and push to a new vector the new values
@@ -194,7 +200,7 @@ namespace zich{
     }
     Matrix Matrix::operator-()
     {
-        size_t i,j;
+        size_t i = 0; size_t j = 0;
         size_t rows = (size_t)(this->_numRows);
         size_t cols = (size_t)(this->_numColumns);
         vector<double> vec = this->_identity;
@@ -217,7 +223,7 @@ namespace zich{
             throw(invalid_argument("matrix has row length 0 or column length 0"));
         }
         Matrix mat(*this);
-        size_t i, j;
+        size_t i = 0; size_t j = 0;
         size_t rows =  (size_t)(this ->getNumRows());
         int columns = this -> getNumCols();
         for(i =0; i< rows; i++)
@@ -238,7 +244,7 @@ namespace zich{
         {
             throw(invalid_argument("matrix has row length 0 or column length 0"));
         }
-        size_t i, j;
+        size_t i = 0; size_t j = 0;
         size_t rows =  (size_t)(this ->getNumRows());
         int columns = this -> getNumCols();
         for(i =0; i< rows; i++)
@@ -258,8 +264,8 @@ namespace zich{
         {
             throw(invalid_argument("matrix has row length 0 or column length 0"));
         }
-        size_t i,j;
-        size_t row;
+        size_t i = 0; size_t j = 0;
+        size_t row = 0;
         size_t columns = (size_t)(this->_numColumns);
         for(i=0; i< columns; i++)
         {
@@ -283,8 +289,8 @@ namespace zich{
 
         vector<double> vec;
         int cols = mult.getNumCols();
-        int i,j;
-        double sum;
+        int i=0; int j=0;
+        double sum = 0;
         for(i=0; i< (this -> _numRows); i++)
         {
             for(j=0; j< cols; j++)
@@ -299,7 +305,7 @@ namespace zich{
     Matrix Matrix::operator*(double dub) const
     {
         vector<double> vec;
-        int i, j;
+        int i=0; int j=0;
         for(i=0; i< this->_numRows; i++)
         {
             for(j=0; j< this->_numColumns; j++)
@@ -314,7 +320,7 @@ namespace zich{
     Matrix & Matrix::operator*=(double dub)
     {
         vector<double> vec;
-        int i, j;
+        int i=0; int j=0;
         for(i=0; i< this->_numRows; i++)
         {
             for(j=0; j< this->_numColumns; j++)
@@ -382,7 +388,7 @@ namespace zich{
         string str;
         is >> str;
         int num_rows=1;
-        int num_columns;
+        int num_columns = 0;
         size_t size = str.size();
         int index = 0;
         if (str.at(0) != '[' || str.at(size -1) != ']')
@@ -406,11 +412,11 @@ namespace zich{
             }
         }
         // check for invalid characters
-        char c;
+        char c = 0;
         for(size_t i=1; i< size-1; i++)
         {
             c = str.at(i);
-            if( (c < 48 || c > 57) && (c != ' ') && (c != ',') && (c != '.')) // not a digit and not a proper char
+            if( (c < zero || c > nine) && (c != ' ') && (c != ',') && (c != '.')) // not a digit and not a proper char
             {
                 throw(invalid_argument("invalid character found in the input."));
             }
@@ -428,9 +434,9 @@ namespace zich{
             {
                 throw(invalid_argument("space not found after comma."));
             }
-            if(str.at(i) == ',')
+            if(str.at(i) == ',' && !was_comma)
             {
-                was_comma = true;
+                was_comma = !(was_comma);
             }
             else
             {
@@ -443,14 +449,14 @@ namespace zich{
         was_comma = false;
         for(size_t i=1; i< size-1; i++)
         {
-            if(was_comma == false && str.at(i) == ' ') // identify the length of the first row and check out that is the length of the row
+            if( !was_comma && str.at(i) == ' ') // identify the length of the first row and check out that is the length of the row
             {
                 rowlen +=1;
             }
-            if(was_comma == false && str.at(i) == ',') // if we received a comma then differ the first row from the other ones 
+            if( !was_comma && str.at(i) == ',') // if we received a comma then differ the first row from the other ones 
             {
                 i++;
-                was_comma = true;
+                was_comma = !was_comma;
             }
             else if(was_comma) // if the first comma already appeared
             {
@@ -481,7 +487,7 @@ namespace zich{
             if(str.at(i) == '.')
             {
                 num_dots+=1;
-                if( (str.at(i-1) > 57) && (str.at(i-1) < 48) )
+                if( (str.at(i-1) > nine) && (str.at(i-1) < zero) )
                 {
                     throw(invalid_argument("dot without a number before it."));
                 }
@@ -495,7 +501,7 @@ namespace zich{
                 throw(invalid_argument("two dots in the same number."));
             }
         }
-        string number = "";
+        string number;
         vector<double> vec;
         // construct the vector
         for(size_t i=1; i< size-1; i++)
@@ -503,8 +509,10 @@ namespace zich{
             c = str.at(i);
             if(c == ',' || c == ' ') // new number is now contructed last number inserted to the vector
             {
-                if(!number.empty())
+                if( (!number.empty()) )
+                {
                     vec.push_back(stod(number));
+                }
                 number = "";
                 i++;
             }

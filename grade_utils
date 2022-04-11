@@ -17,7 +17,7 @@ run_in_folder_if_exists() {
 		cp $GRADEFILES $1/
 		call cd $1
 		source $0
-		rm $GRADEFILES
+		# rm $GRADEFILES
 		cd ..
 		exit 0
 	fi
