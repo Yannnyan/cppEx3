@@ -40,6 +40,8 @@ namespace zich{
             // prefix operator 
             Matrix & operator++();
             Matrix & operator+=(double num);
+            Matrix & operator+=(Matrix & mat);
+
 
 
             // subtraction
@@ -51,10 +53,12 @@ namespace zich{
             // prefix operator
             Matrix & operator--();
             Matrix & operator-=(double num);
+            Matrix & operator-=(Matrix& mat);
 
             // multiplication
             Matrix operator*(Matrix & mult);
             Matrix operator*(double dub) const;
+            Matrix & operator*= (Matrix & mult);
             friend Matrix operator*(double dub, const Matrix & mat);
 
             Matrix & operator*= (double dub);
@@ -82,6 +86,11 @@ namespace zich{
     inline zich::Matrix::Matrix(const vector<double> & identity, int row, int column)
     {
         int size = identity.size();
+        if (row <= 0 || column <= 0)
+        {
+            throw(invalid_argument("matrix row or column cant be nz"));
+        }
+
         if (size > row * column) // cant initialize the matrix because some elements will not be inserted
         {
             throw(invalid_argument("size of identity bigger than the matrix specified"));

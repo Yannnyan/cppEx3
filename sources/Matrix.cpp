@@ -172,7 +172,23 @@ namespace zich{
         }
         return *this;
     }
-
+    // adds another matrix to the current matrix and returns the current matrix reference
+    Matrix & Matrix::operator+=(Matrix & mat)
+    {
+        if(this-> _numRows != mat.getNumRows() || this-> _numColumns != mat.getNumCols())
+        {throw(invalid_argument("mat addition cant be operated with different matrix sizes. operator+="));}
+        size_t i;
+        size_t j;
+        size_t cols =  (size_t)(mat.getNumCols());
+        for(i =0; i< this ->_numRows; i++)
+        {
+            for(j =0; j<cols; j++)
+            {
+                this-> _identity.at(i * cols + j) += mat.getElement(i,j);
+            }
+        }
+        return *this;
+    }
 
     // subtraction
     Matrix Matrix::operator-(Matrix & mat)
@@ -337,7 +353,11 @@ namespace zich{
     {
         return (mat * dub);
     }
-
+    Matrix & Matrix::operator*=(Matrix & mult)
+    {
+        *this = (*this) * (mult);
+        return *this;
+    }
     // comparisons
     // return true if the sum of the first matrix is bigger than the sum of the second matrix
     bool Matrix::operator>(Matrix & mat2)
