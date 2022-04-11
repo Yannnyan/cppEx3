@@ -6,16 +6,15 @@
 #include <vector>
 #include "Matrix.hpp"
 
-#define DEFAULT_ROWS 10
-#define DEFAULT_COLS 10
+
 using namespace std;
 
 // auxilary functions
-double mult_row_by_col(const zich::Matrix & leftMat, const zich::Matrix & rightMat, int row, int column) const
+double mult_row_by_col(const zich::Matrix & leftMat, const zich::Matrix & rightMat, int row, int column)
 {
     if (leftMat.getNumCols() != rightMat.getNumRows())
     {
-        throw(invalid_arguemnt("row and column must be equal to multiply"));
+        throw(invalid_argument("row and column must be equal to multiply"));
     }
     if (row < 0 || column < 0)
     {
@@ -23,7 +22,7 @@ double mult_row_by_col(const zich::Matrix & leftMat, const zich::Matrix & rightM
     }
     if (row >= leftMat.getNumRows())
     {
-        throw(invalid_argument("row is bigger or equal to the number of rows."));
+        throw(invalid_argument("row is bigger or equal to the number of rows. mult_row_by_col"));
     }
     else if(column >=  leftMat.getNumCols())
     {
@@ -31,7 +30,6 @@ double mult_row_by_col(const zich::Matrix & leftMat, const zich::Matrix & rightM
     }
     int i,j;
     double sum=0;
-    int rows = leftMat.getNumRows();
     int cols = leftMat.getNumCols();
     for(j=0; j< cols; j++)
     {
@@ -39,7 +37,7 @@ double mult_row_by_col(const zich::Matrix & leftMat, const zich::Matrix & rightM
     }
     return sum;
 }
-double sum_matrix(zich:: Matrix mat) const
+double sum_matrix(zich:: Matrix mat)
 {
     int i,j;
     int rows =  mat.getNumRows();
@@ -56,66 +54,9 @@ double sum_matrix(zich:: Matrix mat) const
 }
 
 namespace zich{
-   // constructors
-    inline Matrix::Matrix(const vector<double> & identity, int row, int column)
-    {
-        int size = identity.size();
-        if (size > row * column) // cant initialize the matrix because some elements will not be inserted
-        {
-            throw(invalid_argument("size of identity bigger than the matrix specified"));
-        }
-        else if (size < row * column) // cant initialize the matrix because some cells will be missing
-        {
-            throw(invalid_argument("size of identity smaller than the matrix specified"));
-        }
-        this -> _numRows = row;
-        this -> _numColumns = column;
-        this -> _identity = identity;
-    }
-    inline Matrix::Matrix(const Matrix& mat)
-    {
-        this ->_numRows = mat.getNumRows();
-        this -> _numColumns = mat.getNumCols();
-        this -> _identity = mat.getCopyIdentity(); // using copy constructor of vector<double>
-    }
-    inline Matrix::Matrix() 
-    {
-        // creates a default matrix with 10 x 10 size, with zeros 
-        this -> _numRows = DEFAULT_ROWS;
-        this -> _numColumns = DEFAULT_COLS;
-        vector<double> identity = vector<double>();
-        for (int i=0; i< 100; i++)
-        {
-            identity.push_back(0);
-        }
-        this -> _identity = identity;
-    }
-    // getts and setters
-     inline double Matrix::getElement(int row, int column) const
-    {
-         if (row < 0 || column < 0)
-            {
-                throw (invalid_argument("row or column cant be less than 0."));
-            }
-            if (row >= this ->_numRows)
-            {
-                throw(invalid_argument("row is bigger or equal to the number of rows."));
-            }
-            else if(column >= this -> _numColumns)
-            {
-                throw(invalid_argument("column is bigger or equal to the number of columns."));
-            }
-        size_t index = (size_t)( row * (this -> _numColumns) + column);
-        return (this->_identity).at(index);
-    }
-    inline vector<double> Matrix::getCopyIdentity() const
-    {
-        // using copy constructor of vector<double> to generate copy of the identity vector inside the matrix private fields
-        return this -> _identity;
-    }
     // makes a string representation of the matrix
     // returns a copy of the string
-    string Matrix::toString()
+    string Matrix::toString() const
     {
         string str = "";
         int i,j;
@@ -125,7 +66,10 @@ namespace zich{
             for(j=0;j< this->_numColumns; j++)
             {
                 str.append(to_string(this ->getElement(i,j)));
-                str.push_back(' ');
+                if(j == (this-> _numColumns) - 1)
+                {}
+                else
+                {str.push_back(' ');}
             }
             str.push_back(']');
             str.push_back('\n');
@@ -134,7 +78,7 @@ namespace zich{
     }
     // operators
     // addition
-    Matrix Matrix::operator+(const Matrix & mat1)
+    Matrix Matrix::operator+(Matrix & mat1)
     {
         if (mat1.getNumCols() != this-> _numColumns)
         {
@@ -153,20 +97,25 @@ namespace zich{
                 vec.push_back(this->getElement(i, j) + mat1.getElement(i, j));
             }
         }
-        this -> _identity = vec;
+        return Matrix(vec, this->_numRows, this->_numColumns);
     }
     // postfix operator
     // iterates one by one and increments by num each element
     // returns the previous matrix
     Matrix Matrix::operator++( int )
     {
+        if(this->_numRows == 0 || this-> _numColumns == 0)
+        {
+            throw(invalid_argument("matrix has row length 0 or column length 0"));
+        }
         Matrix mat(*this); // before getting updated this is the return value
         size_t i,j;
         size_t row;
-        for(i=0; i< this->_numRows; i++)
+        size_t columns = (size_t)(this -> _numColumns);
+        for(i=0; i< (this->_numRows); i++)
         {
-            row = i * this->_numColumns;
-            for(j=0; j< this->_numColumns; j++)
+            row = i * columns;
+            for(j=0; j< (this->_numColumns); j++)
             {
                 (this->_identity).at(row + j) ++;
             }
@@ -179,12 +128,17 @@ namespace zich{
     // returns the updated matrix
     Matrix & Matrix::operator++()
     {
+        if(this->_numRows == 0 || this-> _numColumns == 0)
+        {
+            throw(invalid_argument("matrix has row length 0 or column length 0"));
+        }
         size_t i,j;
         size_t row;
+        size_t columns = (size_t)(this->_numColumns);
         for(i=0; i< this->_numRows; i++)
         {
-            row = i * this->_numColumns;
-            for(j=0; j< this->_numColumns; j++)
+            row = i * columns;
+            for(j=0; j< columns; j++)
             {    // returns by reference can be added with default operator ++ for double
                 (this->_identity).at(row + j) ++;
             }
@@ -195,12 +149,17 @@ namespace zich{
     // returns the updated matrix
     Matrix & Matrix::operator+=(double num)
     {   
+        if(this->_numRows == 0 || this-> _numColumns == 0)
+        {
+            throw(invalid_argument("matrix has row length 0 or column length 0"));
+        }
         size_t i,j;
         size_t row;
+        size_t columns = (size_t)(this-> _numColumns);
         for(i=0; i< this->_numRows; i++)
         {
-            row = i * this->_numColumns;
-            for(j=0; j< this->_numColumns; j++)
+            row = i * columns;
+            for(j=0; j< columns; j++)
             {   // returns by reference can be added with default operator += for double
                 (this->_identity).at(row + j) += num; 
             }
@@ -210,13 +169,13 @@ namespace zich{
 
 
     // subtraction
-    Matrix Matrix::operator-(const Matrix & mat)
+    Matrix Matrix::operator-(Matrix & mat)
     {
-        if (mat.getNumCols() != this-> _numColumns)
+        if (mat.getNumCols() != (this-> _numColumns) )
         {
             throw(invalid_argument("number of columns is not equal, operator-"));
         }
-        else if(mat.getNumRows() != this-> _numRows)
+        else if(mat.getNumRows() != (this-> _numRows) )
         {
             throw(invalid_argument("number of rows in not equal, operator-"));
         }
@@ -226,27 +185,46 @@ namespace zich{
         int columns = mat.getNumCols();
         for(i=0; i< rows; i++) // iterate one by one and push to a new vector the new values
         {
-            for(j=0; j< columns; i++)
+            for(j=0; j< columns; j++)
             {
-                vec.push_back(this -> getElement(i,j) - mat.getElement(i,j));
+                vec.push_back( (this -> getElement(i,j)) - mat.getElement(i,j));
             }
         }
         return Matrix(vec,rows,columns); // use constructor to returns the new matrix
+    }
+    Matrix Matrix::operator-()
+    {
+        size_t i,j;
+        size_t rows = (size_t)(this->_numRows);
+        size_t cols = (size_t)(this->_numColumns);
+        vector<double> vec = this->_identity;
+        for(i=0; i< rows; i++)
+        {
+            for(j=0; j< cols; j++)
+            {
+                vec.at(cols * i + j)*= -1;
+            }
+        }
+        return Matrix(vec, this->_numRows, this->_numColumns);
     }
     // postfix operator
     // iterates one by one the decreases the elements by one
     // returns a copy of the previous matrix
     Matrix Matrix::operator--( int )
     {
+        if(this->_numRows == 0 || this-> _numColumns == 0)
+        {
+            throw(invalid_argument("matrix has row length 0 or column length 0"));
+        }
         Matrix mat(*this);
         size_t i, j;
-        int rows =  this ->getNumRows();
+        size_t rows =  (size_t)(this ->getNumRows());
         int columns = this -> getNumCols();
         for(i =0; i< rows; i++)
         {
             for(j=0; j< columns; j++)
             {
-                (this -> _identity).at(i * rows + column) --;
+                (this -> _identity).at(i * rows + j) --;
             }
         }
         return mat; 
@@ -256,14 +234,18 @@ namespace zich{
     // returns the updated matrix
     Matrix & Matrix::operator--()
     {
+        if(this->_numRows == 0 || this-> _numColumns == 0)
+        {
+            throw(invalid_argument("matrix has row length 0 or column length 0"));
+        }
         size_t i, j;
-        int rows =  this ->getNumRows();
+        size_t rows =  (size_t)(this ->getNumRows());
         int columns = this -> getNumCols();
         for(i =0; i< rows; i++)
         {
             for(j=0; j< columns; j++)
             {
-                (this -> _identity).at(i * rows + column) --;
+                (this -> _identity).at(i * rows + j) --;
             }
         }
         return *this;
@@ -272,12 +254,17 @@ namespace zich{
     // returns a reference to the updated matrix
     Matrix & Matrix::operator-=(double num)
     {
+        if(this->_numRows == 0 || this-> _numColumns == 0)
+        {
+            throw(invalid_argument("matrix has row length 0 or column length 0"));
+        }
         size_t i,j;
         size_t row;
-        for(i=0; i< this->_numRows; i++)
+        size_t columns = (size_t)(this->_numColumns);
+        for(i=0; i< columns; i++)
         {
-            row = i * this->_numColumns;
-            for(j=0; j< this->_numColumns; j++)
+            row = i * columns;
+            for(j=0; j< columns; j++)
             {   // returns by reference can be added with default operator -= for double
                 (this->_identity).at(row + j) -= num; 
             }
@@ -287,23 +274,29 @@ namespace zich{
 
     // multiplication
     // multiplies matrixes by definition left row by right column
-    Matrix Matrix::operator*(const Matrix & mult)
+    Matrix Matrix::operator*(Matrix & mult)
     {
+        if(this->getNumCols() != mult.getNumRows())
+        {
+            throw(invalid_argument("cannot multiply matrixes with different amount of rows and columns. operator*"));
+        }
+
         vector<double> vec;
+        int cols = mult.getNumCols();
         int i,j;
         double sum;
         for(i=0; i< (this -> _numRows); i++)
         {
-            for(j=0; j< (this -> _numColumns); j++)
+            for(j=0; j< cols; j++)
             {
-                vec.push_back(this ->mult_row_by_col(*this, mult, i, j));
+                vec.push_back(mult_row_by_col(*this, mult, i, j));
             }
         }
-        return Matrix(vec, (this -> _numRows), (this -> _numColumns));
+        return Matrix(vec, this->_numRows, mult.getNumCols());
     }
     // iterates through each element and multiplies it by dub
     // returns a copy of the result matrix
-    Matrix Matrix::operator*(const double dub)
+    Matrix Matrix::operator*(double dub) const
     {
         vector<double> vec;
         int i, j;
@@ -334,43 +327,43 @@ namespace zich{
     }
     // multiplies a double by matrix
     // returns a copy of the result matrix
-    Matrix operator*(const double dub, const Matrix & mat)
+    Matrix operator*(double dub, const Matrix & mat)
     {
         return (mat * dub);
     }
 
     // comparisons
     // return true if the sum of the first matrix is bigger than the sum of the second matrix
-    bool Matrix::operator>(const Matrix & mat2)
+    bool Matrix::operator>(Matrix & mat2)
     {
         return (sum_matrix(*this) > sum_matrix(mat2));
     }
     // reutnr true if the sum of the first matrix is bigger than or equal to the sum of the second matrix
-    bool Matrix::operator>=(const Matrix & mat2)
+    bool Matrix::operator>=(Matrix & mat2)
     {
         return (sum_matrix(*this) >= sum_matrix(mat2));
     }
 
     // lt
     // return true if the sum of the first matrix is less than the sum of the second matrix
-    bool Matrix::operator<(const Matrix & mat2)
+    bool Matrix::operator<(Matrix & mat2)
     {
         return (sum_matrix(*this) < sum_matrix(mat2));
     }
     // return true if the sum of the first matrix is less or equal to the second matrix
-    bool Matrix::operator<=(const Matrix & mat2)
+    bool Matrix::operator<=( Matrix & mat2)
     {
         return (sum_matrix(*this) <= sum_matrix(mat2));
     }
     
     // eq
     // reuturns true if the sum of the matrixes is equal
-    bool Matrix::operator==(const Matrix & mat2)
+    bool Matrix::operator==(Matrix & mat2)
     {
         return (sum_matrix(*this) == sum_matrix(mat2));
     }
     // returns true is the sum of the matrixes is not equal
-    bool Matrix::operator!=(const Matrix & mat2)
+    bool Matrix::operator!=(Matrix & mat2)
     {
         return (sum_matrix(*this) != sum_matrix(mat2));
     }
@@ -390,7 +383,7 @@ namespace zich{
         is >> str;
         int num_rows=1;
         int num_columns;
-        int size = str.size();
+        size_t size = str.size();
         int index = 0;
         if (str.at(0) != '[' || str.at(size -1) != ']')
         {
@@ -398,7 +391,7 @@ namespace zich{
         }
         bool double_space= false;
         // check for double space
-        for(int i=0; i< size; i++)
+        for(size_t i=0; i< size; i++)
         {
             if(str.at(i) == ' ')
             {
@@ -414,10 +407,10 @@ namespace zich{
         }
         // check for invalid characters
         char c;
-        for(int i=1; i< size-1; i++)
+        for(size_t i=1; i< size-1; i++)
         {
             c = str.at(i);
-            if( (c < 48 || c > 57) && (c != ' ') && (c != ',') && (c != '.'))
+            if( (c < 48 || c > 57) && (c != ' ') && (c != ',') && (c != '.')) // not a digit and not a proper char
             {
                 throw(invalid_argument("invalid character found in the input."));
             }
@@ -429,7 +422,7 @@ namespace zich{
         }
         bool was_comma = false;
         // check for space after comma
-        for(int i=0; i< size-1; i++)
+        for(size_t i=0; i< size-1; i++)
         {
             if(was_comma && str.at(i) != ' ')
             {
@@ -448,7 +441,7 @@ namespace zich{
         int rowlen = 0;
         int current_rowlen = 0;
         was_comma = false;
-        for(int i=1; i< size-1; i++)
+        for(size_t i=1; i< size-1; i++)
         {
             if(was_comma == false && str.at(i) == ' ') // identify the length of the first row and check out that is the length of the row
             {
@@ -480,18 +473,32 @@ namespace zich{
         {
             throw(invalid_argument("found a row that has different length from another other row"));
         }
-
-        // check for dot in wrong places or double dot
-        for(int i=1; i< size-1; i++)
+        int num_dots = 0;
+        // check for dot where there is no number before it
+        // check for two dots or more in the same number
+        for(size_t i=1; i< size-1; i++)
         {
-            if()
+            if(str.at(i) == '.')
+            {
+                num_dots+=1;
+                if( (str.at(i-1) > 57) && (str.at(i-1) < 48) )
+                {
+                    throw(invalid_argument("dot without a number before it."));
+                }
+            }
+            if(str.at(i) == ' ')
+            {
+                num_dots = 0;
+            }
+            if(num_dots >= 2)
+            {
+                throw(invalid_argument("two dots in the same number."));
+            }
         }
-
         string number = "";
         vector<double> vec;
-        char c;
         // construct the vector
-        for(int i=1; i< size-1; i++)
+        for(size_t i=1; i< size-1; i++)
         {
             c = str.at(i);
             if(c == ',' || c == ' ') // new number is now contructed last number inserted to the vector
@@ -508,5 +515,8 @@ namespace zich{
                 i++;
             }
         }
+        num_columns = (int)( vec.size() / (size_t)num_rows );
+        inp = Matrix(vec, num_rows, num_columns);
+        return is;
     }
 }
