@@ -523,6 +523,11 @@ namespace zich{
                 throw(invalid_argument("double ] detected."));
             }
         }
+        // check that the string is not starting and not ending with comma or dot or space
+        if(str.at(0) == '.' || str.at(0) == ',' || str.at(0) == ' ')
+        {
+            throw(invalid_argument("string starts with non valid character."));
+        }
         // check that there is ending for every bracket
         int bracket = 0;
         int dot = 0;
@@ -553,10 +558,11 @@ namespace zich{
                         throw(invalid_argument("found a dot that comes after non digit char."));
                     }
                 }
-                else
+                else // i == 0
                 {
                     throw(invalid_argument("found dot before anything"));
                 }
+                dot+=1;
             }
             if(c == ' ')
             {
@@ -564,7 +570,6 @@ namespace zich{
             }
             if (c == ']')
             {
-                cout << bracket << endl;
                 bracket --;
                 dot = 0;
                 // check that after a closing bracket comes comma
@@ -572,6 +577,15 @@ namespace zich{
                 {
                     throw(invalid_argument("not found comma after closing bracket."));
                 }
+                if (str.at(i+1) == ',' && i != size-2)
+                {
+                    if(str.at(i+2) != ' ')
+                    {
+                        throw(invalid_argument("not found space after comma"));
+                    }
+                }
+
+                
             }
             if (bracket < 0)
             {
@@ -582,39 +596,24 @@ namespace zich{
         {
             throw(invalid_argument("found bracket with no ending."));
         }
-        // split the string into rows seperated by commas
-        // then split the row into numbers seperated by space
-        string *rows = split_by_comma(str);
+        // iterate through the string and seperate numbers by the next format:
+        // [number ], [ number], [number], [x number y]
+        // traverse all the string, if found a start of a number -> enter a loop untill encounter ']' or ' ', if any other encounter throw exception
+        string number;
+        for(size_t i=0; i< size; i++)
+        {
+            c = str.at(i);
+            while(((c > zero && c < nine) || c == '.') && i < size)
+            {
+                number.push_back(c);
+                c = str.at(++i);
+            }
+            if(number.size() > 0)
+                vec.push_back(stod(number));
+            number.clear();
+        }
         int num_rows = size_by_comma(str);
-        string **matrix = new string*[(size_t)num_rows]; // array that contains rows of the matrix
-        for(int i=0; i< num_rows; i++)
-        {
-            matrix[i] = split_by_space(rows[i]);
-        }
-        int size_row=0, j=0;
-        // check that between spaces there is an actual double and not type error
-        for(int i=0; i< num_rows; i++)
-        {
-            size_row = size_by_space(rows[i]);
-            for(j=0; j< size_row; j++)
-            {
-                vec.push_back(stod(matrix[i][j])); // should throw exception if number is not valid
-            }
-        }
-        // check that the elements rows have the same size
-        int cur_size = 0;
-        for(int i=0; i< num_rows; i++)
-        {
-            cur_size = size_by_space(rows[i]);
-            if(cur_size != size_row)
-            {
-                throw(invalid_argument("row sizes are different."));
-            }
-        }
-        // free the arrays created
-        delete[](rows);
-        delete[](matrix);
-        inp = Matrix(vec, num_rows, size_row); // already throws exception if number of elements not match
+        inp = Matrix(vec, num_rows, (int)(vec.size() / (size_t)num_rows));
         return is;
     }
 }
@@ -630,7 +629,7 @@ int size_by_comma(string str)
             ret+=1;
         }
     }
-    return ret;
+    return ret+1;
 }
 // gives the size of the word by counting the number of spaces inside a row
 int size_by_space(string str)
@@ -644,7 +643,7 @@ int size_by_space(string str)
             ret+=1;
         }
     }
-    return ret;
+    return ret+1;
 }
 // splits the rows by commas
 string * split_by_comma(string str)
