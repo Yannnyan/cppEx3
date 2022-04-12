@@ -46,9 +46,9 @@ namespace zich{
 
 
             // subtraction
-            Matrix operator-(Matrix & mat);
+            Matrix operator-(Matrix & mat) const;
             // unary - prefix operator
-            Matrix operator-();
+            Matrix operator-() const;
             // postfix operator
             Matrix operator--( int );
             // prefix operator
@@ -57,7 +57,7 @@ namespace zich{
             Matrix & operator-=(Matrix& mat);
 
             // multiplication
-            Matrix operator*(Matrix & mult);
+            Matrix operator*(Matrix & mult) const;
             Matrix operator*(double dub) const;
             Matrix & operator*= (Matrix & mult);
             friend Matrix operator*(double dub, const Matrix & mat);
@@ -67,19 +67,19 @@ namespace zich{
             // comparisons
             
             // bigger than
-            bool operator>(const Matrix & mat2);
-            bool operator>=(const Matrix & mat2);
+            bool operator>(const Matrix & mat2) const;
+            bool operator>=(const Matrix & mat2) const;
 
             // lt
-            bool operator<(const Matrix & mat2);
-            bool operator<=(const Matrix & mat2);
+            bool operator<(const Matrix & mat2) const;
+            bool operator<=(const Matrix & mat2) const;
             
             // eq
             friend bool operator==(const Matrix & mat1, const Matrix & mat2);
             friend bool operator!=(const Matrix & mat1, const Matrix & mat2);
 
             // input output
-            friend ostream & operator<<(ostream& os, const Matrix & mat);
+            friend ostream & operator<<(ostream& os, const Matrix & mat) ;
             friend istringstream & operator>>(istringstream& is, Matrix & inp);
     };
 }
@@ -150,8 +150,6 @@ namespace zich{
 // auxilary functions
 double mult_row_by_col(const zich::Matrix & leftMat,const zich::Matrix & rightMat, int row, int column);
 double sum_matrix(const zich::Matrix & mat);
-string *split_by_comma(string str);
-string *split_by_space(string str);
-int size_by_comma(string str);
-int size_by_space(string str);
+int size_by_comma(const string & str);
+
 

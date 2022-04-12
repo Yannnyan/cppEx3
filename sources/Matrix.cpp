@@ -69,7 +69,7 @@ namespace zich{
             str.push_back('[');
             for(j=0;j< this->_numColumns; j++)
             {
-                if (floor(this->getElement(i,j) == this->getElement(i,j)))
+                if (floor(this->getElement(i,j)) == this->getElement(i,j))
                 {
                     str.append(to_string((int)this->getElement(i,j)));
                 }
@@ -81,8 +81,10 @@ namespace zich{
                 {str.push_back(' ');}
             }
             str.push_back(']');
-            if(i != this->_numRows - 1)
+            if(i != this->_numRows - 1
+            ){
                 str.push_back('\n');
+            }
         }
         return str;
     }
@@ -185,8 +187,8 @@ namespace zich{
     {
         if(this-> _numRows != mat.getNumRows() || this-> _numColumns != mat.getNumCols())
         {throw(invalid_argument("mat addition cant be operated with different matrix sizes. operator+="));}
-        size_t i;
-        size_t j;
+        size_t i = 0;
+        size_t j = 0;
         size_t cols =  (size_t)(mat.getNumCols());
         for(i =0; i< this ->_numRows; i++)
         {
@@ -199,7 +201,7 @@ namespace zich{
     }
 
     // subtraction
-    Matrix Matrix::operator-(Matrix & mat)
+    Matrix Matrix::operator-(Matrix & mat) const
     {
         if (mat.getNumCols() != (this-> _numColumns) )
         {
@@ -222,7 +224,7 @@ namespace zich{
         }
         return Matrix(vec,rows,columns); // use constructor to returns the new matrix
     }
-    Matrix Matrix::operator-()
+    Matrix Matrix::operator-() const
     {
         size_t i = 0; size_t j = 0;
         size_t rows = (size_t)(this->_numRows);
@@ -308,7 +310,7 @@ namespace zich{
     }
     // multiplication
     // multiplies matrixes by definition left row by right column
-    Matrix Matrix::operator*(Matrix & mult)
+    Matrix Matrix::operator*(Matrix & mult) const
     {
         if(this->getNumCols() != mult.getNumRows())
         {
@@ -372,7 +374,7 @@ namespace zich{
     }
     // comparisons
     // return true if the sum of the first matrix is bigger than the sum of the second matrix
-    bool Matrix::operator>(const Matrix & mat2)
+    bool Matrix::operator>(const Matrix & mat2) const
     {
         if(this->_numRows < mat2.getNumRows() || this-> _numColumns < mat2.getNumCols())
         {
@@ -385,7 +387,7 @@ namespace zich{
         return (sum_matrix(*this) > sum_matrix(mat2));
     }
     // reutnr true if the sum of the first matrix is bigger than or equal to the sum of the second matrix
-    bool Matrix::operator>=(const Matrix & mat2)
+    bool Matrix::operator>=(const Matrix & mat2) const
     {
         if(this->_numRows < mat2.getNumRows() || this-> _numColumns < mat2.getNumCols())
         {
@@ -400,7 +402,7 @@ namespace zich{
 
     // lt
     // return true if the sum of the first matrix is less than the sum of the second matrix
-    bool Matrix::operator<(const Matrix & mat2)
+    bool Matrix::operator<(const Matrix & mat2) const
     {
         if(this->_numRows < mat2.getNumRows() || this-> _numColumns < mat2.getNumCols())
         {
@@ -413,7 +415,7 @@ namespace zich{
         return (sum_matrix(*this) < sum_matrix(mat2));
     }
     // return true if the sum of the first matrix is less or equal to the second matrix
-    bool Matrix::operator<=(const Matrix & mat2)
+    bool Matrix::operator<=(const Matrix & mat2) const
     {
         if(this->_numRows < mat2.getNumRows() || this-> _numColumns < mat2.getNumCols())
         {
@@ -608,8 +610,10 @@ namespace zich{
                 number.push_back(c);
                 c = str.at(++i);
             }
-            if(number.size() > 0)
+            if(!number.empty())
+            {
                 vec.push_back(stod(number));
+            }
             number.clear();
         }
         int num_rows = size_by_comma(str);
@@ -618,7 +622,7 @@ namespace zich{
     }
 }
 // gives the size of the matrix by counting the number of commas
-int size_by_comma(string str)
+int size_by_comma(const string & str)
 {
     int ret = 0;
     int size = str.size();
@@ -630,52 +634,4 @@ int size_by_comma(string str)
         }
     }
     return ret+1;
-}
-// gives the size of the word by counting the number of spaces inside a row
-int size_by_space(string str)
-{
-    int ret = 0;
-    size_t size = (size_t)str.size();
-    for(size_t i=0; i< size; i++)
-    {
-        if (str.at(i) == ' ')
-        {
-            ret+=1;
-        }
-    }
-    return ret+1;
-}
-// splits the rows by commas
-string * split_by_comma(string str)
-{
-    size_t size = (size_t)size_by_comma(str);
-    string * ret = new string[size];
-    string deli = ",";
-    size_t pos = 0;
-    size_t last_pos = 0;
-    int at = 0;
-    while ((pos = str.find(deli)) != string::npos)
-    {
-        string token = str.substr(last_pos, pos);
-        ret[at++] = token;
-        last_pos = pos;
-    }
-    return ret;
-}
-// splits the numbers inside the row to number array
-string * split_by_space(string str)
-{
-    size_t size = (size_t)size_by_comma(str);
-    string * ret = new string[size];
-    string deli = " ";
-    size_t pos = 0;
-    size_t last_pos = 0;
-    int at = 0;
-    while ((pos = str.find(deli)) != string::npos)
-    {
-        string token = str.substr(last_pos, pos);
-        ret[at++] = token;
-        last_pos = pos;
-    }
-    return ret;
 }
