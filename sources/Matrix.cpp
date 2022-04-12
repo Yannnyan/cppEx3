@@ -4,7 +4,9 @@
 #include <stdexcept>
 #include <stdbool.h>
 #include <vector>
+#include <stack>
 #include "Matrix.hpp"
+#include <math.h>
 
 constexpr int zero = 48;
 constexpr int nine = 57;
@@ -25,7 +27,7 @@ double mult_row_by_col(const zich::Matrix & leftMat, const zich::Matrix & rightM
     {
         throw(invalid_argument("row is bigger or equal to the number of rows. mult_row_by_col"));
     }
-    if(column >=  leftMat.getNumCols())
+    if(column >=  rightMat.getNumCols())
     {
         throw(invalid_argument("column is bigger or equal to the number of columns."));
     }
@@ -39,7 +41,7 @@ double mult_row_by_col(const zich::Matrix & leftMat, const zich::Matrix & rightM
     }
     return sum;
 }
-double sum_matrix(zich::Matrix &mat)
+double sum_matrix(const zich::Matrix &mat)
 {
     int i=0; int j=0;
     int rows =  mat.getNumRows();
@@ -67,14 +69,20 @@ namespace zich{
             str.push_back('[');
             for(j=0;j< this->_numColumns; j++)
             {
-                str.append(to_string(this ->getElement(i,j)));
-                if(j == (this-> _numColumns) - 1)
-                {}
+                if (floor(this->getElement(i,j) == this->getElement(i,j)))
+                {
+                    str.append(to_string((int)this->getElement(i,j)));
+                }
                 else
+                {
+                    str.append(to_string(this ->getElement(i,j)));
+                }
+                if(j != (this-> _numColumns) - 1)
                 {str.push_back(' ');}
             }
             str.push_back(']');
-            str.push_back('\n');
+            if(i != this->_numRows - 1)
+                str.push_back('\n');
         }
         return str;
     }
@@ -241,12 +249,12 @@ namespace zich{
         Matrix mat(*this);
         size_t i = 0; size_t j = 0;
         size_t rows =  (size_t)(this ->getNumRows());
-        int columns = this -> getNumCols();
+        size_t columns = (size_t)(this -> getNumCols());
         for(i =0; i< rows; i++)
         {
             for(j=0; j< columns; j++)
             {
-                (this -> _identity).at(i * rows + j) --;
+                (this -> _identity).at(i * columns + j) --;
             }
         }
         return mat; 
@@ -262,12 +270,12 @@ namespace zich{
         }
         size_t i = 0; size_t j = 0;
         size_t rows =  (size_t)(this ->getNumRows());
-        int columns = this -> getNumCols();
+        size_t columns = (size_t)(this -> getNumCols());
         for(i =0; i< rows; i++)
         {
             for(j=0; j< columns; j++)
             {
-                (this -> _identity).at(i * rows + j) --;
+                (this -> _identity).at(i * columns + j) --;
             }
         }
         return *this;
@@ -293,7 +301,11 @@ namespace zich{
         }
         return *this;
     }
-
+    Matrix & Matrix::operator-=(Matrix & mat)
+    {
+        *this = (*this) - mat;
+        return *this;
+    }
     // multiplication
     // multiplies matrixes by definition left row by right column
     Matrix Matrix::operator*(Matrix & mult)
@@ -360,38 +372,100 @@ namespace zich{
     }
     // comparisons
     // return true if the sum of the first matrix is bigger than the sum of the second matrix
-    bool Matrix::operator>(Matrix & mat2)
+    bool Matrix::operator>(const Matrix & mat2)
     {
+        if(this->_numRows < mat2.getNumRows() || this-> _numColumns < mat2.getNumCols())
+        {
+            throw(invalid_argument("rows and collumns must be at the same size. operator>"));
+        }
+        if (this -> _numRows > mat2.getNumRows() || this -> _numColumns > mat2.getNumCols())
+        {
+            throw(invalid_argument("rows and collumns must be at the same size. operator>"));
+        }
         return (sum_matrix(*this) > sum_matrix(mat2));
     }
     // reutnr true if the sum of the first matrix is bigger than or equal to the sum of the second matrix
-    bool Matrix::operator>=(Matrix & mat2)
+    bool Matrix::operator>=(const Matrix & mat2)
     {
+        if(this->_numRows < mat2.getNumRows() || this-> _numColumns < mat2.getNumCols())
+        {
+            throw(invalid_argument("rows and collumns must be at the same size. operator>="));
+        }
+        if (this -> _numRows > mat2.getNumRows() || this -> _numColumns > mat2.getNumCols())
+        {
+            throw(invalid_argument("rows and collumns must be at the same size. operator>="));
+        }
         return (sum_matrix(*this) >= sum_matrix(mat2));
     }
 
     // lt
     // return true if the sum of the first matrix is less than the sum of the second matrix
-    bool Matrix::operator<(Matrix & mat2)
+    bool Matrix::operator<(const Matrix & mat2)
     {
+        if(this->_numRows < mat2.getNumRows() || this-> _numColumns < mat2.getNumCols())
+        {
+            throw(invalid_argument("rows and collumns must be at the same size. operator<"));
+        }
+        if (this -> _numRows > mat2.getNumRows() || this -> _numColumns > mat2.getNumCols())
+        {
+            throw(invalid_argument("rows and collumns must be at the same size. operator<"));
+        }
         return (sum_matrix(*this) < sum_matrix(mat2));
     }
     // return true if the sum of the first matrix is less or equal to the second matrix
-    bool Matrix::operator<=( Matrix & mat2)
+    bool Matrix::operator<=(const Matrix & mat2)
     {
+        if(this->_numRows < mat2.getNumRows() || this-> _numColumns < mat2.getNumCols())
+        {
+            throw(invalid_argument("rows and collumns must be at the same size. operator<="));
+        }
+        if (this -> _numRows > mat2.getNumRows() || this -> _numColumns > mat2.getNumCols())
+        {
+            throw(invalid_argument("rows and collumns must be at the same size. operator<="));
+        }
         return (sum_matrix(*this) <= sum_matrix(mat2));
     }
     
     // eq
     // reuturns true if the sum of the matrixes is equal
-    bool Matrix::operator==(Matrix & mat2)
+    bool operator==(const Matrix & mat1, const Matrix & mat2)
     {
-        return (sum_matrix(*this) == sum_matrix(mat2));
+        if(mat1._numRows < mat2.getNumRows() || mat1._numColumns < mat2.getNumCols())
+        {
+            throw(invalid_argument("rows and collumns must be at the same size. operator=="));
+        }
+        if (mat1._numRows > mat2.getNumRows() || mat1._numColumns > mat2.getNumCols())
+        {
+            throw(invalid_argument("rows and collumns must be at the same size. operator=="));
+        }
+        int i = 0;
+        int j = 0;
+        int rows = mat1.getNumRows();
+        int cols = mat1.getNumCols();
+        for(i =0; i< rows; i++)
+        {
+            for(j =0; j< cols; j++)
+            {
+                if(mat1.getElement(i,j) != mat2.getElement(i,j))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     // returns true is the sum of the matrixes is not equal
-    bool Matrix::operator!=(Matrix & mat2)
+    bool operator!=(const Matrix & mat1, const Matrix & mat2)
     {
-        return (sum_matrix(*this) != sum_matrix(mat2));
+        if(mat1._numRows < mat2.getNumRows() || mat2._numColumns < mat2.getNumCols())
+        {
+            throw(invalid_argument("rows and collumns must be at the same size. operator!="));
+        }
+        if (mat1._numRows > mat2.getNumRows() || mat1._numColumns > mat2.getNumCols())
+        {
+            throw(invalid_argument("rows and collumns must be at the same size. operator!="));
+        }
+        return !(mat1 == mat2);
     }
 
     // input output
@@ -402,149 +476,207 @@ namespace zich{
         return os;
     }   
     // receives string matrix representation and parses it to a matrix
-    istream & operator>>(istream& is, Matrix & inp)
+    istringstream & operator>>(istringstream& is, Matrix & inp)
     {
-        // format is as specified : [1 2 3, 5 6 7, 9 8 7]
+        stack<char> s;
+        vector<double> vec;
         string str;
-        is >> str;
-        int num_rows=1;
-        int num_columns = 0;
+        str = is.str();
+        cout << str << endl;
         size_t size = str.size();
-        int index = 0;
-        if (str.at(0) != '[' || str.at(size -1) != ']')
-        {
-            throw(invalid_argument("brackets are not found"));
-        }
-        bool double_space= false;
-        // check for double space
-        for(size_t i=0; i< size; i++)
-        {
-            if(str.at(i) == ' ')
-            {
-                if(double_space)
-                {
-                    throw(invalid_argument("invalid double space found in the input."));
-                }
-                double_space = true;
-            }
-            else{
-                double_space = false;
-            }
-        }
         // check for invalid characters
         char c = 0;
-        for(size_t i=1; i< size-1; i++)
-        {
-            c = str.at(i);
-            if( (c < zero || c > nine) && (c != ' ') && (c != ',') && (c != '.')) // not a digit and not a proper char
-            {
-                throw(invalid_argument("invalid character found in the input."));
-            }
-        }
-        // check for invalid space before the first char
-        if(str.at(1) == ' ' || str.at(size-2) == ' ')
-        {
-            throw(invalid_argument("space found before the first char or before the last char."));
-        }
-        bool was_comma = false;
-        // check for space after comma
         for(size_t i=0; i< size-1; i++)
         {
-            if(was_comma && str.at(i) != ' ')
+            c = str.at(i);
+            if((c < zero || c > nine) && c != ' ' && c != ',' && c != '.' && c != '[' && c != ']')
             {
-                throw(invalid_argument("space not found after comma."));
-            }
-            if(str.at(i) == ',' && !was_comma)
-            {
-                was_comma = !(was_comma);
-            }
-            else
-            {
-                was_comma = false;
+                throw(invalid_argument("character is not valid"));
             }
         }
-        // check for the same amount of numbers between each commas
-        int rowlen = 0;
-        int current_rowlen = 0;
-        was_comma = false;
-        for(size_t i=1; i< size-1; i++)
-        {
-            if( !was_comma && str.at(i) == ' ') // identify the length of the first row and check out that is the length of the row
-            {
-                rowlen +=1;
-            }
-            if( !was_comma && str.at(i) == ',') // if we received a comma then differ the first row from the other ones 
-            {
-                i++;
-                was_comma = !was_comma;
-            }
-            else if(was_comma) // if the first comma already appeared
-            {
-                if(str.at(i) == ' ') // if we got a space then another number appeared, we already checked there is no double space or more
-                {
-                    current_rowlen +=1 ;
-                }
-                if(str.at(i) == ',') // if we got another comma, then check if the length of the current comma is different from the first row
-                {
-                    i++;
-                    if(current_rowlen != rowlen) // if it's different then throw.
-                    {
-                        throw(invalid_argument("found a row that has different length from another other row"));
-                    }
-                    current_rowlen = 0; // else keep running.
-                }
-            }
-        }
-        if(rowlen != current_rowlen) // cover for the case in which the comma and space ends the row
-        {
-            throw(invalid_argument("found a row that has different length from another other row"));
-        }
-        int num_dots = 0;
-        // check for dot where there is no number before it
-        // check for two dots or more in the same number
-        for(size_t i=1; i< size-1; i++)
-        {
-            if(str.at(i) == '.')
-            {
-                num_dots+=1;
-                if( (str.at(i-1) > nine) && (str.at(i-1) < zero) )
-                {
-                    throw(invalid_argument("dot without a number before it."));
-                }
-            }
-            if(str.at(i) == ' ')
-            {
-                num_dots = 0;
-            }
-            if(num_dots >= 2)
-            {
-                throw(invalid_argument("two dots in the same number."));
-            }
-        }
-        string number;
-        vector<double> vec;
-        // construct the vector
+        // check for double valid characters
         for(size_t i=1; i< size-1; i++)
         {
             c = str.at(i);
-            if(c == ',' || c == ' ') // new number is now contructed last number inserted to the vector
+            // check that there is no double space
+            if(c == ' ' && str.at(i-1) == ' ')
             {
-                if( (!number.empty()) )
-                {
-                    vec.push_back(stod(number));
-                }
-                number = "";
-                i++;
+                throw(invalid_argument("double space detected."));
             }
-            while(i < size-1 && c != ' ' && c != ',') // construct a number
-            { 
-                c = str.at(i);
-                number.push_back(c);
-                i++;
+            // check that there is no double ,
+            if(c == ',' && str.at(i-1) == ',')
+            {
+                throw(invalid_argument("double , detected."));
+            }
+            // check that there is no double .
+            if(c == '.' && str.at(i-1) == '.')
+            {
+                throw(invalid_argument("double . detected."));
+            }
+            // check that there is no double [
+            if(c == '[' && str.at(i-1) == '[')
+            {
+                throw(invalid_argument("double [ detected."));
+            }
+            if(c == ']' && str.at(i-1) == ']')
+            {
+                throw(invalid_argument("double ] detected."));
             }
         }
-        num_columns = (int)( vec.size() / (size_t)num_rows );
-        inp = Matrix(vec, num_rows, num_columns);
+        // check that there is ending for every bracket
+        int bracket = 0;
+        int dot = 0;
+        for(size_t i=0; i< size ; i++)
+        {
+            c = str.at(i);
+            if(c == '[')
+            {
+                bracket++;
+            }
+            if (bracket > 0) // check if a comma comes before an ending of a bracket
+            {
+                if(c == ',')
+                {
+                    throw(invalid_argument("found comma before ending a bracket."));
+                }
+            }
+            if(c == '.')
+            {
+                if (dot > 0)
+                {
+                    throw(invalid_argument("found a dot after another dot without seperation."));
+                }
+                if(i >= 1)
+                {
+                    if (str.at(i-1) < zero && str.at(i-1) > nine)
+                    {
+                        throw(invalid_argument("found a dot that comes after non digit char."));
+                    }
+                }
+                else
+                {
+                    throw(invalid_argument("found dot before anything"));
+                }
+            }
+            if(c == ' ')
+            {
+                dot = 0;
+            }
+            if (c == ']')
+            {
+                cout << bracket << endl;
+                bracket --;
+                dot = 0;
+                // check that after a closing bracket comes comma
+                if (str.at(i+1) != ',' && i != size-2)
+                {
+                    throw(invalid_argument("not found comma after closing bracket."));
+                }
+            }
+            if (bracket < 0)
+            {
+                throw(invalid_argument("found double ending for a bracket or ending for non existing opening bracket."));
+            }
+        }
+        if (bracket != 0)
+        {
+            throw(invalid_argument("found bracket with no ending."));
+        }
+        // split the string into rows seperated by commas
+        // then split the row into numbers seperated by space
+        string *rows = split_by_comma(str);
+        int num_rows = size_by_comma(str);
+        string **matrix = new string*[(size_t)num_rows]; // array that contains rows of the matrix
+        for(int i=0; i< num_rows; i++)
+        {
+            matrix[i] = split_by_space(rows[i]);
+        }
+        int size_row=0, j=0;
+        // check that between spaces there is an actual double and not type error
+        for(int i=0; i< num_rows; i++)
+        {
+            size_row = size_by_space(rows[i]);
+            for(j=0; j< size_row; j++)
+            {
+                vec.push_back(stod(matrix[i][j])); // should throw exception if number is not valid
+            }
+        }
+        // check that the elements rows have the same size
+        int cur_size = 0;
+        for(int i=0; i< num_rows; i++)
+        {
+            cur_size = size_by_space(rows[i]);
+            if(cur_size != size_row)
+            {
+                throw(invalid_argument("row sizes are different."));
+            }
+        }
+        // free the arrays created
+        delete[](rows);
+        delete[](matrix);
+        inp = Matrix(vec, num_rows, size_row); // already throws exception if number of elements not match
         return is;
     }
+}
+// gives the size of the matrix by counting the number of commas
+int size_by_comma(string str)
+{
+    int ret = 0;
+    int size = str.size();
+    for(size_t i=0; i< size; i++)
+    {
+        if (str.at(i) == ',')
+        {
+            ret+=1;
+        }
+    }
+    return ret;
+}
+// gives the size of the word by counting the number of spaces inside a row
+int size_by_space(string str)
+{
+    int ret = 0;
+    size_t size = (size_t)str.size();
+    for(size_t i=0; i< size; i++)
+    {
+        if (str.at(i) == ' ')
+        {
+            ret+=1;
+        }
+    }
+    return ret;
+}
+// splits the rows by commas
+string * split_by_comma(string str)
+{
+    size_t size = (size_t)size_by_comma(str);
+    string * ret = new string[size];
+    string deli = ",";
+    size_t pos = 0;
+    size_t last_pos = 0;
+    int at = 0;
+    while ((pos = str.find(deli)) != string::npos)
+    {
+        string token = str.substr(last_pos, pos);
+        ret[at++] = token;
+        last_pos = pos;
+    }
+    return ret;
+}
+// splits the numbers inside the row to number array
+string * split_by_space(string str)
+{
+    size_t size = (size_t)size_by_comma(str);
+    string * ret = new string[size];
+    string deli = " ";
+    size_t pos = 0;
+    size_t last_pos = 0;
+    int at = 0;
+    while ((pos = str.find(deli)) != string::npos)
+    {
+        string token = str.substr(last_pos, pos);
+        ret[at++] = token;
+        last_pos = pos;
+    }
+    return ret;
 }

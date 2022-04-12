@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <stdbool.h>
 #include <vector>
+#include <string>
 
 using namespace std;
 #define DEFAULT_ROWS 10
@@ -66,20 +67,20 @@ namespace zich{
             // comparisons
             
             // bigger than
-            bool operator>(Matrix & mat2);
-            bool operator>=( Matrix & mat2);
+            bool operator>(const Matrix & mat2);
+            bool operator>=(const Matrix & mat2);
 
             // lt
-            bool operator<(Matrix & mat2);
-            bool operator<=( Matrix & mat2);
+            bool operator<(const Matrix & mat2);
+            bool operator<=(const Matrix & mat2);
             
             // eq
-            bool operator==( Matrix & mat2);
-            bool operator!=( Matrix & mat2);
+            friend bool operator==(const Matrix & mat1, const Matrix & mat2);
+            friend bool operator!=(const Matrix & mat1, const Matrix & mat2);
 
             // input output
             friend ostream & operator<<(ostream& os, const Matrix & mat);
-            friend istream & operator>>(istream& is, Matrix & inp);
+            friend istringstream & operator>>(istringstream& is, Matrix & inp);
     };
 }
 // constructors
@@ -148,5 +149,9 @@ namespace zich{
     }
 // auxilary functions
 double mult_row_by_col(const zich::Matrix & leftMat,const zich::Matrix & rightMat, int row, int column);
-double sum_matrix(zich::Matrix & mat);
+double sum_matrix(const zich::Matrix & mat);
+string *split_by_comma(string str);
+string *split_by_space(string str);
+int size_by_comma(string str);
+int size_by_space(string str);
 
